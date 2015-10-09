@@ -45,7 +45,7 @@ TH1F* allMPPCplot(int j,int z,Crystal_t (&Crystal)[64],Input_t (&Input)[16],Para
   
   //find the entries for this z in this crystal
   Crystal[j].SumZentries[z] = histo->GetMaximum();
-  histo->Scale(Params.zScaling[z]*(1/histo->GetMaximum()));
+//   histo->Scale(Params.zScaling[z]*(1/histo->GetMaximum()));
   
   
   TSpectrum *sCrystal;
@@ -54,9 +54,9 @@ TH1F* allMPPCplot(int j,int z,Crystal_t (&Crystal)[64],Input_t (&Input)[16],Para
   Float_t *CrystalPeaks = sCrystal->GetPositionX();
   //Float_t *TagCrystalPeaksY = sTagCrystal->GetPositionY();
   TF1 *gauss = new TF1("gauss", "gaus");
-  histo->Fit("gauss","Q","",CrystalPeaks[0] - 0.2*CrystalPeaks[0],CrystalPeaks[0] + 0.2*CrystalPeaks[0]);
+  histo->Fit("gauss","Q","",CrystalPeaks[0] - 0.05*CrystalPeaks[0],CrystalPeaks[0] + 0.2*CrystalPeaks[0]);
   tempStream.str("");
-  tempStream << sumstring << ">" << gauss->GetParameter(1) - 1.5*gauss->GetParameter(2) << "&&" << sumstring << "<" << gauss->GetParameter(1) + 2.0*gauss->GetParameter(2);
+  tempStream << sumstring << ">" << gauss->GetParameter(1) - 0.5*gauss->GetParameter(2) << "&&" << sumstring << "<" << gauss->GetParameter(1) + 2.0*gauss->GetParameter(2);
   
   Crystal[j].ZcrystalPeakCut[z] = tempStream.str().c_str();
   

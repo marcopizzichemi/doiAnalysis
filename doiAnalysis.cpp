@@ -59,6 +59,7 @@
 #include "./inc/singleMPPCplot.h"
 #include "./inc/allMPPCplot.h"
 #include "./inc/ratioPlot.h"
+#include "./inc/ratioPlotAll.h"
 
 int main (int argc, char** argv)
 {
@@ -332,6 +333,12 @@ int main (int argc, char** argv)
       tempStream.str("");
       tempStream << "CanvasRatio" << j;
       Crystal[j].Cratio = new TCanvas(tempStream.str().c_str(),tempStream.str().c_str(),800,600);
+      Crystal[j].ZratioAll = new TH1F ("SumPlot","",500,0,1);
+      Crystal[j].ZratioAll->SetTitle("");
+      Crystal[j].ZratioAll->SetFillColor(kBlack);
+      Crystal[j].ZratioAll->SetFillStyle(3001);
+      legendRatio->AddEntry(Crystal[j].ZratioAll,"Sum plot","f");
+//       Crystal[j].ZratioAll->Draw();
       for (int z = 0 ; z < Params.zPosition.size() ; z++)
       {
 	Crystal[j].Zratio[z] = ratioPlot(j,z,Crystal,Input,Params,chain);
@@ -342,9 +349,20 @@ int main (int argc, char** argv)
 	legendRatio->AddEntry(Crystal[j].Zratio[z],tempStream.str().c_str(),"f");
 	
 	if(z==0)
-	  Crystal[j].Zratio[z]->Draw();
+	{
+// 	  Crystal[j].Zratio[z]->Draw();
+	  Crystal[j].ZratioAll->Add(Crystal[j].Zratio[z]);
+	}
 	else
-	  Crystal[j].Zratio[z]->Draw("same");
+	{
+// 	  Crystal[j].Zratio[z]->Draw("same");
+	  Crystal[j].ZratioAll->Add(Crystal[j].Zratio[z]);
+	}
+      }
+      Crystal[j].ZratioAll->Draw();
+      for (int z = 0 ; z < Params.zPosition.size() ; z++)
+      {
+	Crystal[j].Zratio[z]->Draw("same");
       }
       legendRatio->Draw();
       
@@ -400,10 +418,10 @@ int main (int argc, char** argv)
   
   if(Params.saveAnalysisTree)
   {
-    //     TFile* fTree = new TFile("temp.root","recreate");
-    //     fTree->cd();
-    //     chain->Write();
-    //     fTree->Close();
+    TFile* fTree = new TFile("temp.root","recreate");
+    fTree->cd();
+    chain->Write();
+    fTree->Close();
   }
   
   

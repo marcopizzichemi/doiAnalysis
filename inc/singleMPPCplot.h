@@ -27,7 +27,7 @@ TH1F* singleMPPCplot(int j,int z,Crystal_t (&Crystal)[64],Params_t &Params,TChai
   
   //find the entries for this z in this crystal
   Crystal[j].SingleZentries[z] = histo->GetMaximum();
-  histo->Scale(Params.zScaling[z]*(1/histo->GetMaximum()));
+//   histo->Scale(Params.zScaling[z]*(1/histo->GetMaximum()));
 
   
   

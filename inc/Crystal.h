@@ -28,7 +28,9 @@ struct Crystal_t
   
   TCanvas* Cratio;
   TCanvas* CZratio[5];
+  TCanvas* CZratioAll;
   TH1F* Zratio[5];
+  TH1F* ZratioAll;
   TH1F* ratio;
   
   double x[5],y[5],ex[5],ey[5];
