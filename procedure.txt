@@ -82,7 +82,7 @@ i j                           are the i j coordinates of the crystal in the arra
 m q                           are the inclination and offset of the linear fit of the N points in this crystal (w,z). beware that this z are the uncorrected one 
 doiRes  averageSigma          doi resolution of this crystal calculated with m and average of the w sigmas in this crystals. And the value of average w sigma in this crystal. Values in mm, doi is FWHM
 w0                            mean of the gaussian fit of the w histogram for this point, for crystal 0 
-sigma0                        sigma of the gaussian fit of the w histo for this point, for crystal 0   
+sigma0                        sigma/sqrt_nentries of the gaussian fit of the w histo for this point, for crystal 0   
 sqrt_nentries0                square root of the number of entries in the w histo for this point, for crystal 0 
 The last 3 values are repeated for as many many times as many points were taken in the vertical scan.
 
