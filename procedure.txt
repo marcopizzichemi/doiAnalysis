@@ -1,0 +1,99 @@
+PROCEDURE:
+The DOI scan analysis procedure is described here. 
+It consists in 
+1) analyzing the individual datasets one by one with ModuleCalibration and proper conf files, to produce the histograms
+2) run on the histogram files to extract the points (mean of the w histograms and z positions) and produce the final dataset
+
+So you will need to have ModuleCalibration installed (and in general PATH), and you need the zconfig.cfg files to have the appropriate parameters.
+An example zconfig.cfg file is given in this folder. See this file for how to modify it. One of the doiAnalysis programs in this github needs to be compiled 
+and put in PATH (doifit.cpp, see the file for compiling command), the others are script and only need to be copied in some folder in the PATH. 
+
+The analysis procedure can be done manually or using the two scripts
+
+- startAnalysis.sh --> takes care of step 1 and runs in parallel
+- produceDatasets.sh --> takes care of step 2
+
+WE STRONGLY SUGGEST using the scripts (see point B).
+
+Finally, at the end of this file you can find the format of the output files that will be produced by this analysis.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+A) MANUAL PROCEDURE:
+
+- first analyze the y one by one
+
+go to the yN folder, prepare the zconfig.cfg files in such a way that the right mppc numbers are selected etc. See example of relevant lines here:
+
+# doi tagging bench
+usingTaggingBench = 1      # if this is a tagging DOI bench measurement, put 1, otherwise 0
+taggingPosition = 13.6     # position of the tagging bench in mm 
+taggingCrystalChannel = 16  
+digiChannelsForDoi = 12,13,14,15
+doiColumnOffset = 1        # for DOI output, fix the column i by adding this quantity. if not stated, 0 by default
+
+IMPORTANT - doiColumnOffset has to be chosen between 0 and 1 (or more) according the the real column under investigation in this y. otherwise it's always interpreted as 0 (i.e. the leftmost column of crystals in this mppc)
+
+- Then from the yN folder start the dataset analysis
+
+for j in z0 z1 z2 z3 z4; do cd $j/Run*/; ModuleCalibration -c zconfig.cfg `ls TTree_*` ; cd ../../; done
+
+afterwards, move the doiData files
+
+for i in y0 y1 y2 y3 y4 y5 y6 y7 ; do for j in z0 z1 z2 z3 z4; do cp $i/$j/Run*/doiData.txt $i/$j/doiData.txt ; done; done
+
+and do the doi analysis for each yN with
+
+doifit
+
+from the yN folder. This produces a calibration_params.txt and a doi.txt file for each yN folder, then copy them in the "all" folder: from the DOI_scan folder do 
+
+for i in y0 y1 y2 y3 y4 y5 y6 y7 ; do cp $i/calibration_params.txt ./all/${i}calibration_params.txt ; cp $i/doi.txt ./all/${i}doi.txt; done
+
+and cat them to single files: from the all folder do
+
+for i in y0 y1 y2 y3 y4 y5 y6 y7 ; do  cat ${i}calibration_params.txt >> calibration_params.txt; done
+for i in y0 y1 y2 y3 y4 y5 y6 y7 ; do  cat ${i}doi.txt >> doi.txt; done
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+B) AUTOMATIC PROCEDURE:
+
+You need to prepare the zconfig files properly anyway, so see the first step of manual procedure (A)
+Then, running startAnalysis.sh and produceDatasets.sh will do everything. Check those files for instructions.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+C) OUTPUT FILES STRUCTURE
+
+The analysis produces some text files as output. They are in the all_zconfig folder that will be created by the automatic macros (or by you if you do it manually). 
+It's just two types of files: 
+
+- calibration_params 
+- doi
+
+The ones without any yN in the name are the global ones, the others are specific to one y.
+
+- calibration_params.txt file:
+Contain data of the individual w points, crystal by crystal. Each row is a crystal and has:
+i  j  m  q  doiRes  averageSigma  w0  sigma0  sqrt_nentries0  w1  sigma1  sqrt_nentries1  .......  wN  sigma1N  sqrt_nentries1N
+where
+i j                           are the i j coordinates of the crystal in the array (both start from 0 at bottom left, increasing)
+m q                           are the inclination and offset of the linear fit of the N points in this crystal (w,z). beware that this z are the uncorrected one 
+doiRes  averageSigma          doi resolution of this crystal calculated with m and average of the w sigmas in this crystals. And the value of average w sigma in this crystal. Values in mm, doi is FWHM
+w0                            mean of the gaussian fit of the w histogram for this point, for crystal 0 
+sigma0                        sigma of the gaussian fit of the w histo for this point, for crystal 0   
+sqrt_nentries0                square root of the number of entries in the w histo for this point, for crystal 0 
+The last 3 values are repeated for as many many times as many points were taken in the vertical scan.
+
+- doi.txt file:
+Only lists the doi res per crystal. Not very useful
+Data is organized like this
+
+i  j  doires  doiResError
+
+
+
+
+
+
