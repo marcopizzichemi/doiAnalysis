@@ -187,7 +187,7 @@ int main (int argc, char** argv)
 
   std::ofstream doi;
   doi.open("doi.txt");
-  for(int j = NumOfCrystals ; j > -1 ; j--)
+  for(int j = NumOfCrystals -1 ; j > -1 ; j--)
   {
     doi << Crystal[j].x[0] << "\t" << Crystal[j].y[0] << "\t" ;
     doi << Crystal[j].doires << "\t" << Crystal[j].avgs <<std::endl;
