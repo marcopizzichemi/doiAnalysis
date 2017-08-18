@@ -1,12 +1,12 @@
 PROCEDURE:
-The DOI scan analysis procedure is described here. 
-It consists in 
+The DOI scan analysis procedure is described here.
+It consists in
 1) analyzing the individual datasets one by one with ModuleCalibration and proper conf files, to produce the histograms
 2) run on the histogram files to extract the points (mean of the w histograms and z positions) and produce the final dataset
 
 So you will need to have ModuleCalibration installed (and in general PATH), and you need the zconfig.cfg files to have the appropriate parameters.
-An example zconfig.cfg file is given in this folder. See this file for how to modify it. One of the doiAnalysis programs in this github needs to be compiled 
-and put in PATH (doifit.cpp, see the file for compiling command), the others are script and only need to be copied in some folder in the PATH. 
+An example zconfig.cfg file is given in this folder. See this file for how to modify it. One of the doiAnalysis programs in this github needs to be compiled
+and put in PATH (doifit.cpp, see the file for compiling command), the others are script and only need to be copied in some folder in the PATH.
 
 The analysis procedure can be done manually or using the two scripts
 
@@ -26,8 +26,8 @@ go to the yN folder, prepare the zconfig.cfg files in such a way that the right 
 
 # doi tagging bench
 usingTaggingBench = 1      # if this is a tagging DOI bench measurement, put 1, otherwise 0
-taggingPosition = 13.6     # position of the tagging bench in mm 
-taggingCrystalChannel = 16  
+taggingPosition = 13.6     # position of the tagging bench in mm
+taggingCrystalChannel = 16
 digiChannelsForDoi = 12,13,14,15
 doiColumnOffset = 1        # for DOI output, fix the column i by adding this quantity. if not stated, 0 by default
 
@@ -45,7 +45,7 @@ and do the doi analysis for each yN with
 
 doifit
 
-from the yN folder. This produces a calibration_params.txt and a doi.txt file for each yN folder, then copy them in the "all" folder: from the DOI_scan folder do 
+from the yN folder. This produces a calibration_params.txt and a doi.txt file for each yN folder, then copy them in the "all" folder: from the DOI_scan folder do
 
 for i in y0 y1 y2 y3 y4 y5 y6 y7 ; do cp $i/calibration_params.txt ./all/${i}calibration_params.txt ; cp $i/doi.txt ./all/${i}doi.txt; done
 
@@ -66,10 +66,10 @@ Then, running startAnalysis.sh and produceDatasets.sh will do everything. Check 
 
 C) OUTPUT FILES STRUCTURE
 
-The analysis produces some text files as output. They are in the all_zconfig folder that will be created by the automatic macros (or by you if you do it manually). 
-It's just two types of files: 
+The analysis produces some text files as output. They are in the all_zconfig folder that will be created by the automatic macros (or by you if you do it manually).
+It's just two types of files:
 
-- calibration_params 
+- calibration_params
 - doi
 
 The ones without any yN in the name are the global ones, the others are specific to one y.
@@ -79,11 +79,11 @@ Contain data of the individual w points, crystal by crystal. Each row is a cryst
 i  j  m  q  doiRes  averageSigma  w0  sigma0  sqrt_nentries0  w1  sigma1  sqrt_nentries1  .......  wN  sigma1N  sqrt_nentries1N
 where
 i j                           are the i j coordinates of the crystal in the array (both start from 0 at bottom left, increasing)
-m q                           are the inclination and offset of the linear fit of the N points in this crystal (w,z). beware that this z are the uncorrected one 
+m q                           are the inclination and offset of the linear fit of the N points in this crystal (w,z). beware that this z are the uncorrected one
 doiRes  averageSigma          doi resolution of this crystal calculated with m and average of the w sigmas in this crystals. And the value of average w sigma in this crystal. Values in mm, doi is FWHM
-w0                            mean of the gaussian fit of the w histogram for this point, for crystal 0 
-sigma0                        sigma/sqrt_nentries of the gaussian fit of the w histo for this point, for crystal 0   
-sqrt_nentries0                square root of the number of entries in the w histo for this point, for crystal 0 
+w0                            mean of the gaussian fit of the w histogram for this point, for crystal 0
+sigma0                        sigma/sqrt_nentries of the gaussian fit of the w histo for this point, for crystal 0
+sqrt_nentries0                square root of the number of entries in the w histo for this point, for crystal 0
 The last 3 values are repeated for as many many times as many points were taken in the vertical scan.
 
 - doi.txt file:
@@ -94,6 +94,22 @@ i  j  doires  doiResError
 
 
 
+D) Calculate DOI resolution
 
+The standard method to measure DOI resolution of a module is calculated via the moduleAnalysis program (found in https://github.com/marcopizzichemi/Macros). This involves a standard "top" (far source) measurement of the matrix, and some point from a DOI setup for calculating the sigma w. See documentation of moduleAnalysis.cpp.
 
+An alternate method is based on just DOI scan acquisitions, but requires a full DOI scan of the whole matrix for the whole length of all the crystals. In this way, the interpolation lines are extracted, and you can calculate for each event the difference of the doi position calculated from w via the calibration line and the position of the DOI tagging setup, then the width of the histograms of all this values is the doi resolution.
 
+For the alternate method, you need to first process all data of all DOI scans with a standard zconfig file, then process again all data with a zAlternate.cfg config where you add these lines:
+
+calcDoiResWithDelta = 1
+calcDoiFileName = /media/data/NewMat30mm/DOI_scan/all_zconfig/calibration_params.txt
+pointsFromDoi = 10
+
+With calcDoiFileName as the file (and path) of the   calibration_params.txt file obtained by the standard zconfig.cfg analysis of DOI data, while pointsFromDoi is the number of points taken during each DOI scan. In the end each DOI data folder (the Run_* ones) will have a file called altDoiRes.txt with a line per doi point per crystal, with
+
+i j doires
+
+doires are already the FWHM DOI of the histograms mentioned before. You can join them all together and average, for example.
+
+The standard method has the advantage of being much faster: a "top" acquisition requires just a few minutes, and then only 3-4 acqs from a DOI scan are needed. In fact, with one DOI scan position you get as many sigma w as the crystals not in the frame of the matrix (only central are used for better accuracy), then for example in a 8x8 matrix a reasonable average can be achieved with 4 acqs (4+4+4+4 = 16 sigma w). In general best accuracy if achieved by DOi tagging positions in the middle of the longitudinal direction.

@@ -56,9 +56,6 @@ public:
 };
 
 
-
-
-
 int main (int argc, char** argv)
 {
   std::vector<std::string> file;
@@ -103,9 +100,6 @@ int main (int argc, char** argv)
     }
   }
 
-
-
-
   //calc average sigma w peak (multiply first by sqrt_nentries)
   for(int i = 0 ; i < NumOfCrystals ; i++)
   {
@@ -134,10 +128,8 @@ int main (int argc, char** argv)
     for(int tt = 0 ; tt < file.size()  ;tt++)
     {
       tempEy.push_back(0.5);
-//       tempEx.push_back( Crystal[tt].s[j]);
     }
 
-    //Crystal[j].doiR = new TGraphErrors(5,&Crystal[j].x[0],&Crystal[j].y[0],&Crystal[j].ex[0],&Crystal[j].ey[0]);
     Crystal[j].doiR = new TGraphErrors(file.size(),&Crystal[j].w[0],&Crystal[j].z[0],&Crystal[j].s[0],&tempEy[0]);
     Crystal[j].doiR->GetXaxis()->SetTitle("W");
     Crystal[j].doiR->GetYaxis()->SetTitle("DOI [mm]");
@@ -193,5 +185,6 @@ int main (int argc, char** argv)
     doi << Crystal[j].doires << "\t" << Crystal[j].avgs <<std::endl;
   }
   doi.close();
+
   return 0;
 }
