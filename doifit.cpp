@@ -66,7 +66,8 @@ int main (int argc, char** argv)
     file.push_back(inputStream.str());
   }
 
-  std::ifstream data[file.size()];
+  std::ifstream *data;
+  data = new std::ifstream[file.size()];
   int x,y;
   double w,z,s,sqrt_nentries;
   std::vector<int> counter;
