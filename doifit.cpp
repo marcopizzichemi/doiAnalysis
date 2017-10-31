@@ -96,6 +96,10 @@ int main (int argc, char** argv)
     {
       std::cout << "ERROR: doiData.txt files have different number of rows!" << std::endl;
       std::cout << "Aborting" << std::endl;
+      for(int i = 0 ; i < counter.size() ; i++)
+      {
+        std::cout << counter[i] << std::endl;
+      }
       return -1;
     }
   }
@@ -132,7 +136,16 @@ int main (int argc, char** argv)
 
     Crystal[j].doiR = new TGraphErrors(file.size(),&Crystal[j].w[0],&Crystal[j].z[0],&Crystal[j].s[0],&tempEy[0]);
     Crystal[j].doiR->GetXaxis()->SetTitle("W");
+
     Crystal[j].doiR->GetYaxis()->SetTitle("DOI [mm]");
+    Crystal[j].doiR->GetXaxis()->SetTitleSize(0.06);
+    Crystal[j].doiR->GetXaxis()->SetTitleOffset(0.8);
+    Crystal[j].doiR->GetXaxis()->SetLabelSize(0.045);
+    Crystal[j].doiR->GetYaxis()->SetTitleSize(0.06);
+    Crystal[j].doiR->GetYaxis()->SetTitleOffset(0.7);
+    Crystal[j].doiR->GetYaxis()->SetLabelSize(0.045);
+    Crystal[j].doiR->GetXaxis()->SetNdivisions(412);
+    // Crystal[j].doiR->GetXaxis()->SetRangeUser(0.35,0.55);
     tempStream.str("");
     tempStream << "DOI vs. R - Crystal " << j ;
     Crystal[j].doiR->SetTitle("");
